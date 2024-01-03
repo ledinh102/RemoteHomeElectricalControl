@@ -65,8 +65,16 @@ public class TimerActivity extends AppCompatActivity {
         .setMinute(minuteOfDay)
         .setTitleText("Select end time")
         .build();
-    pickerStartTime.addOnPositiveButtonClickListener(v -> edtStartTime.setText(pickerStartTime.getHour() + ":" + pickerStartTime.getMinute()));
-    pickerEndTime.addOnPositiveButtonClickListener(v -> edtEndTime.setText(pickerEndTime.getHour() + ":" + pickerEndTime.getMinute()));
+    pickerStartTime.addOnPositiveButtonClickListener(v -> {
+      String hour = pickerStartTime.getHour() >= 10 ? String.valueOf(pickerStartTime.getHour()) : "0" + pickerStartTime.getHour();
+      String minute = pickerStartTime.getMinute() >= 10 ? String.valueOf(pickerStartTime.getMinute()) : "0" + pickerStartTime.getMinute();
+      edtStartTime.setText(hour + ":" + minute);
+    });
+    pickerEndTime.addOnPositiveButtonClickListener(v -> {
+      String hour = pickerEndTime.getHour() >= 10 ? String.valueOf(pickerEndTime.getHour()) : "0" + pickerEndTime.getHour();
+      String minute = pickerEndTime.getMinute() >= 10 ? String.valueOf(pickerEndTime.getMinute()) : "0" + pickerEndTime.getMinute();
+      edtEndTime.setText(hour + ":" + minute);
+    });
     edtStartTime.setOnClickListener(v -> {
       pickerStartTime.show(getSupportFragmentManager(), "tag");
       edtStartTime.setError(null);
@@ -82,6 +90,7 @@ public class TimerActivity extends AppCompatActivity {
       edtEndTime.setText("");
       startTimeRef.setValue("");
       endTimeRef.setValue("");
+      Toast.makeText(this, "Timer has been cancelled", Toast.LENGTH_SHORT).show();
     });
     topAppBar.setNavigationOnClickListener(v -> finish());
   }
@@ -102,6 +111,8 @@ public class TimerActivity extends AppCompatActivity {
     if (checkAllFields(startTime, endTime)) {
       startTimeRef.setValue(startTime);
       endTimeRef.setValue(endTime);
+      Toast.makeText(this, "Timer successfully.", Toast.LENGTH_SHORT).show();
+      finish();
     }
   }
 

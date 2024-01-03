@@ -5,12 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.card.MaterialCardView;
@@ -33,8 +31,6 @@ public class DeviceActivity extends AppCompatActivity {
   FirebaseDatabase db;
   DatabaseReference stateDeviceRef, countDeviceRef, usagesDeviceRef, deviceRef;
   float count = 0, usages = 0;
-  private Handler handler = new Handler();
-  private final int UPDATE_INTERVAL = 1000;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +61,6 @@ public class DeviceActivity extends AppCompatActivity {
             slider.setValue(state);
             aSwitch.setVisibility(View.GONE);
             imgDevice.setImageResource(R.drawable.img_fan);
-            Toast.makeText(DeviceActivity.this, "The fan is running at level: " + state, Toast.LENGTH_SHORT).show();
           } else {
             slider.setVisibility(View.GONE);
             aSwitch.setVisibility(View.VISIBLE);
@@ -93,15 +88,10 @@ public class DeviceActivity extends AppCompatActivity {
         stateDeviceRef.setValue(1);
         imgDevice.setImageResource(R.drawable.led_on);
         aSwitch.setText("ON");
-        Toast.makeText(this, "The light is \"ON\"", Toast.LENGTH_SHORT).show();
-        startUsagesUpdateTask();
       } else {
-        stopUsagesUpdateTask();
         stateDeviceRef.setValue(0);
         imgDevice.setImageResource(R.drawable.led_off);
         aSwitch.setText("OFF");
-        Toast.makeText(this, "The light is \"OFF\"", Toast.LENGTH_SHORT).show();
-        countDeviceRef.setValue(count + 1);
       }
     });
 
@@ -128,31 +118,18 @@ public class DeviceActivity extends AppCompatActivity {
     cardViewTimer = findViewById(R.id.cardViewTimer);
   }
 
-  private void startUsagesUpdateTask() {
-    handler.postDelayed(usagesUpdateRunnable, UPDATE_INTERVAL);
-  }
-
-  private void stopUsagesUpdateTask() {
-    handler.removeCallbacks(usagesUpdateRunnable);
-  }
-
-  private Runnable usagesUpdateRunnable = new Runnable() {
-    @Override
-    public void run() {
-      usagesDeviceRef.setValue(usages + 1);
-      handler.postDelayed(this, UPDATE_INTERVAL);
-    }
-  };
-
   private String formatTime(float seconds) {
     if (seconds < 60) {
       return String.format("%.0f", seconds) + "s";
     } else if (seconds < 3600) {
       float minutes = seconds / 60;
       return String.format("%.1f", minutes) + "m";
-    } else {
+    } else if (seconds < 86400){
       float hours = seconds / 3600;
       return String.format("%.1f", hours) + "h";
+    } else {
+      float days = seconds / 86400;
+      return String.format("%.1f", days) + "d";
     }
   }
 }
